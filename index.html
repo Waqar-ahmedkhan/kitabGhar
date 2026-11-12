@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0D100B" />
+  <meta name="description" content="Explore Pakistani, Chinese, Indian, and world literature with illustrated edition covers on the Kitab Ghar bookshelf." />
+  <title>Kitab Ghar — The Story Shelf</title>
+  <!-- Exact font families are requested from their original Google Fonts endpoints.
+       The page remains one HTML file, but these fonts and the four art sheets need internet access. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Inter+Tight:wght@500;600&family=Noto+Sans+JP:wght@500&family=Noto+Serif+SC:wght@500;600&family=Noto+Nastaliq+Urdu:wght@500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #0D100B;
+      --sheet: #151A11;
+      --ink: #F0F2E9;
+      --muted: #A7AE9C;
+      --cobalt: #B9E51B;
+      --rule: rgba(185,229,27,.38);
+      --ease: cubic-bezier(.16,1,.3,1);
+      --H: min(46vh, 31vw);
+      --sans: "Inter Tight", "Noto Sans JP", system-ui, sans-serif;
+      --serif: "Newsreader", Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    html { width:100%; height:100%; background:var(--paper); }
+    body {
+      margin:0; width:100%; height:100%; overflow:hidden;
+      background:var(--paper); color:var(--ink);
+      font-family:var(--sans); user-select:none;
+      -webkit-font-smoothing: antialiased;
+      text-rendering:optimizeLegibility;
+    }
+    button,a { font:inherit; -webkit-tap-highlight-color:transparent; }
+    button { cursor:pointer; }
+    a { color:inherit; text-decoration:none; }
+    button:focus-visible, a:focus-visible { outline:2px solid var(--cobalt); outline-offset:4px; }
+    .lbl {
+      font-family:var(--sans); font-weight:600; font-size:10.5px;
+      line-height:1; letter-spacing:.09em; text-transform:uppercase; white-space:nowrap;
+    }
+    .box { display:inline-flex; height:21px; align-items:center; justify-content:center; border:1px solid var(--rule); padding:0 8px; }
+    .topbar {
+      position:fixed; z-index:12; inset:0 0 auto; height:84px;
+      padding:0 32px; display:grid; grid-template-columns:1fr auto 1fr;
+      align-items:center; pointer-events:none;
+    }
+    .topbar > * { pointer-events:auto; }
+    .back { justify-self:start; transition:color .3s var(--ease); }
+    .back:hover { color:var(--cobalt); }
+    .brand { display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5px; color:var(--cobalt); white-space:nowrap; }
+    .brand-zh { font-family:"Noto Nastaliq Urdu", serif; font-weight:500; font-size:23px; letter-spacing:0; line-height:1.9; direction:rtl; }
+    .brand-en { font-size:9px; font-family:var(--sans); font-weight:600; letter-spacing:.34em; padding-left:.34em; line-height:1; }
+    .career { justify-self:end; }
+    .decades {
+      position:fixed; z-index:15;
+      top:calc(50% - var(--H) / 2 - 86px); left:50%; transform:translateX(-50%);
+      display:flex; isolation:isolate;
+    }
+    .tab-highlight { position:absolute; z-index:-1; left:0; top:0; height:23px; width:0;
+      background:var(--cobalt); pointer-events:none;
+      transition:transform .6s var(--ease), width .6s var(--ease); }
+    .decade-btn { height:23px; padding:0 11px; border:1px solid var(--rule);
+      margin-left:-1px; background:transparent; position:relative;
+      color:var(--ink); transition:color .45s var(--ease); }
+    .decade-btn:first-of-type { margin-left:0; }
+    .decade-btn[aria-current="true"] { color:#101409; }
+    .shelf {
+      position:fixed; z-index:5; left:0; width:100%;
+      top:calc(50% - var(--H) / 2 - 40px); height:calc(var(--H) + 80px);
+      perspective:2200px; perspective-origin:50% 50%; touch-action:pan-y;
+    }
+    .stage {
+      position:absolute; width:0; height:0; left:50%; top:50%;
+      transform-style:preserve-3d;
+      --ws:65px; --d:200px;
+    }
+    .tape { position:absolute; width:0; height:0; left:0; top:0;
+      transform-style:preserve-3d; will-change:transform;
+    }
+    .face {
+      position:absolute; height:var(--H); top:calc(var(--H) / -2);
+      border-radius:2px; backface-visibility:hidden; background-repeat:no-repeat;
+      background-color:#b9ac96; overflow:hidden; transform-style:preserve-3d;
+    }
+    .face::after {
+      content:""; position:absolute; inset:0; border-radius:inherit;
+      background:rgba(0,0,0,var(--shade,0)); pointer-events:none;
+    }
+    .sp { width:var(--ws); left:calc(var(--ws) / -2); transform:translateZ(calc(var(--d) / 2)); }
+    .cv {
+      width:var(--d); left:calc(var(--d) / -2);
+      transform:rotateY(90deg) translateZ(calc(var(--ws) / 2));
+      box-shadow:0 30px 60px -28px rgba(20,16,10,.55);
+    }
+    .play {
+      position:fixed; z-index:20; left:50%; top:50%; width:42px; height:42px;
+      display:grid; place-items:center; border-radius:50%;
+      border:1px solid var(--cobalt); background:rgba(13,16,11,.85);
+      color:var(--cobalt); padding:0; transform:translate(-50%,-50%) scale(0);
+      will-change:transform;
+    }
+    .play-triangle {
+      width:0; height:0; margin-left:3px; border-top:6px solid transparent;
+      border-bottom:6px solid transparent; border-left:10px solid currentColor;
+    }
+    .caption {
+      position:fixed; top:calc(50% + var(--H) / 2 + 30px);
+      width:100%; z-index:10; display:flex; flex-direction:column; align-items:center;
+      gap:9px; text-align:center; pointer-events:none;
+    }
+    .cap-mask { position:relative; width:min(92vw,760px); overflow:hidden; }
+    .cap-mask > span { position:absolute; inset:0; width:100%; display:block; text-align:center; }
+    .cap-mask.title { height:37px; font-family:var(--serif); font-size:31px;
+      font-weight:400; line-height:1.12; letter-spacing:-.01em; }
+    .cap-mask.sub { height:13px; color:var(--cobalt); font-family:var(--sans);
+      font-weight:500; font-size:10.5px; line-height:13px; letter-spacing:.09em; text-transform:uppercase; }
+    .cap-mask.year { height:14px; font-family:var(--sans); font-weight:500;
+      font-size:11px; line-height:14px; letter-spacing:.08em; }
+    .arrow {
+      position:fixed; top:calc(50% + var(--H) / 2 + 40px); z-index:15;
+      border:0; background:transparent; padding:0; width:44px; height:44px;
+      display:grid; place-items:center; color:var(--ink);
+      transition:color .3s var(--ease);
+    }
+    .arrow:hover { color:var(--cobalt); }
+    .arrow.left { left:20px; } .arrow.right { right:20px; }
+    .arrow svg { width:18px; height:10px; stroke:currentColor; stroke-width:1.2;
+      stroke-linejoin:round; fill:none; }
+    .footer {
+      position:fixed; left:32px; right:32px; bottom:26px;
+      display:flex; justify-content:space-between; align-items:center;
+      z-index:12; gap:14px;
+    }
+    .footer .links { display:flex; gap:10px; }
+    .footer a:hover { color:var(--cobalt); }
+    .grain {
+      position:fixed; z-index:40; inset:0; pointer-events:none;
+      mix-blend-mode:soft-light; opacity:.15;
+      background-repeat:repeat;
+    }
+    /* Fine-pointer cursor: its motion is controlled exclusively by the rAF engine. */
+    .cursor { position:fixed; left:0; top:0; z-index:100; width:58px; height:58px;
+      margin-left:-29px; margin-top:-29px; pointer-events:none; visibility:hidden;
+      will-change:transform; }
+    .cursor-ring { position:absolute; inset:0; border-radius:50%;
+      border:1.5px solid var(--ink); background:transparent;
+      transform:scale(1); transition:transform .5s var(--ease),
+        background-color .4s var(--ease), border-color .4s var(--ease); }
+    .cursor-dot { position:absolute; left:26px; top:26px; width:6px; height:6px;
+      border-radius:50%; background:var(--ink); transform:scale(1);
+      transition:transform .4s var(--ease); }
+    .cursor-word { position:absolute; inset:0; display:grid; place-content:center; text-align:center;
+      color:white; font-family:var(--sans); font-weight:600; font-size:10px;
+      line-height:1.25; letter-spacing:.1em; transform:scale(0);
+      transition:transform .45s var(--ease); }
+    .cursor[data-mode="spine"] .cursor-ring { transform:scale(.72); }
+    .cursor[data-mode="btn"] .cursor-ring { transform:scale(.55); }
+    .cursor[data-mode="btn"] .cursor-dot { transform:scale(0); }
+    .cursor[data-mode="open"] .cursor-ring { transform:scale(1.75);
+      background:var(--cobalt); border-color:var(--cobalt); }
+    .cursor[data-mode="open"] .cursor-dot { transform:scale(0); }
+    .cursor[data-mode="open"] .cursor-word { transform:scale(1); }
+    .detail {
+      position:fixed; inset:0; z-index:60; background:var(--sheet); visibility:hidden;
+      pointer-events:none; overflow:hidden; clip-path:inset(0); transform:rotate(0deg);
+    }
+    .detail-top {
+      position:absolute; top:0; left:0; right:0; height:84px;
+      display:flex; align-items:center; justify-content:center; pointer-events:none;
+    }
+    .detail-top .brand { pointer-events:auto; }
+    .close { position:absolute; top:31px; left:32px; z-index:5;
+      background:transparent; color:var(--ink); cursor:pointer; }
+    .close:hover { color:var(--cobalt); }
+    .detail-grid {
+      position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr;
+      gap:4vw; align-items:center; padding:110px 6vw 56px 7vw;
+    }
+    .details-left { width:100%; max-width:520px; display:flex; flex-direction:column;
+      align-items:flex-start; gap:18px; min-width:0; }
+    .reveal { overflow:hidden; width:100%; }
+    .reveal > span, .reveal > .reveal-content { display:block; transform:translateY(110%); }
+    .details-sub { color:var(--cobalt); font-weight:500; }
+    .details-title { font-family:var(--serif); font-weight:400;
+      font-size:clamp(44px,5.4vw,84px); letter-spacing:-.025em;
+      line-height:1; padding-top:3px; }
+    .details-meta { color:var(--muted); }
+    .details-synopsis { font-family:var(--serif); font-size:17px; line-height:1.5;
+      max-width:42ch; }
+    .details-credit { font-family:var(--serif); font-style:italic; font-size:15px;
+      color:var(--muted); line-height:1.35; }
+    .details-watch { margin-top:10px; min-height:44px;
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:0 20px; color:var(--cobalt); border:1px solid var(--cobalt);
+      background:transparent; font-size:10.5px; letter-spacing:.09em;
+      font-weight:600; text-transform:uppercase; white-space:nowrap;
+      transition:background-color .35s var(--ease), color .35s var(--ease); }
+    .details-watch:hover { background:var(--cobalt); color:var(--sheet); }
+    .watch-status { font-size:10px; color:var(--muted); letter-spacing:.06em;
+      text-transform:uppercase; line-height:1.5; max-width:32ch; display:none; }
+    .watch-status.shown { display:block; }
+    .poster-col { height:100%; display:flex; align-items:center; justify-content:center; min-height:0; }
+    .poster { height:min(100%,78vh); width:auto; max-width:100%; aspect-ratio:474 / 750;
+      overflow:visible; display:block; filter:drop-shadow(0 24px 30px rgba(23,19,13,.13)); }
+    @media (pointer:fine) {
+      html,body,button,a { cursor:none !important; }
+      .cursor { visibility:visible; }
+    }
+    @media (max-width:767px) {
+      :root { --H:min(60vw,40svh); }
+      .topbar { height:64px; padding:0 16px; }
+      .brand { gap:4px; }
+      .brand-zh { font-size:17px; }
+      .brand-en { font-size:7.5px; }
+      .lbl { font-size:9px; }
+      .career { display:none; }
+      .decades { top:calc(50% - var(--H) / 2 - 70px); }
+      .decade-btn { padding:0 7px; }
+      .caption .cap-mask.title { font-size:24px; height:30px; }
+      .caption .cap-mask.sub { font-size:9px; }
+      .arrow.left { left:6px; } .arrow.right { right:6px; }
+      .footer { left:16px; right:16px; bottom:18px; }
+      .detail { overflow-y:auto; overscroll-behavior:contain; }
+      .detail-top { height:64px; }
+      .close { left:16px; top:21px; }
+      .detail-grid { position:relative; min-height:100%; display:flex; flex-direction:column;
+        align-items:stretch; gap:24px; padding:84px 22px 40px; }
+      .poster-col { order:-1; flex:none; height:46svh; }
+      .poster { height:46svh; max-width:100%; }
+      .details-left { gap:15px; max-width:none; }
+      .details-title { font-size:42px; }
+      .details-synopsis { font-size:16px; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *, *::before, *::after { transition-duration:0ms !important; }
+    }
+    ::selection { background:var(--cobalt); color:var(--paper); }
+    .brand { transition:color .35s var(--ease); }
+    .brand-en { color:var(--muted); font-size:9px; letter-spacing:.2em; padding-left:.2em; }
+    .box { border-radius:3px; transition:background .35s var(--ease),color .35s var(--ease); }
+    .box:hover { background:var(--cobalt); color:var(--paper); }
+    .cv { box-shadow:0 26px 45px -18px rgba(0,0,0,.7); }
+    .play { transition:background .3s var(--ease),color .3s var(--ease); }
+    .play:hover { background:var(--cobalt); color:var(--paper); }
+    .cursor[data-mode="open"] .cursor-word { color:var(--paper); }
+    .details-watch:hover { color:var(--paper); }
+    @media (max-width:767px) {
+      .brand-zh { font-size:19px; }
+      .brand-en { font-size:7px; }
+      .topbar .brand { transform:translateY(5px); }
+    }
+
+    .cv::before { content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+      background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(255,255,255,.12) 3%,transparent 8%,transparent 95%,rgba(0,0,0,.2)); }
+    .poster { aspect-ratio:474 / 750; }
+    .face { border-radius:3px; }
+    .sp { border-radius:5px 5px 2px 2px; }
+    .sp::before { content:''; position:absolute; z-index:2; inset:0; pointer-events:none;
+      background:linear-gradient(90deg,rgba(0,0,0,.6),rgba(255,255,255,.2) 18%,transparent 38%,rgba(0,0,0,.12) 75%,rgba(0,0,0,.6));
+      box-shadow:inset 0 2px 1px rgba(255,255,255,.2),inset 0 -3px 3px rgba(0,0,0,.5); }
+    .spine-title,.spine-author { position:absolute; color:#fff4dc; writing-mode:vertical-rl;
+      font-family:'Newsreader','Noto Serif SC',Georgia,serif; text-shadow:0 1px 2px rgba(0,0,0,.55); }
+    .spine-title { top:6%; left:24%; max-height:66%; font-size:calc(var(--H) * .044); line-height:1.05; }
+    .spine-author { bottom:7%; right:12%; max-height:36%; font-size:calc(var(--H) * .025); opacity:.85; }
+    .sp[data-country="China"] .spine-title { font-size:calc(var(--H) * .065); letter-spacing:.15em; }
+    .spine-art { position:absolute; bottom:5%; left:15%; width:52%; height:16%; object-fit:cover; border-radius:1px; opacity:.92; }
+    .cv { border-radius:2px 5px 5px 2px; box-shadow:6px 24px 38px -15px rgba(0,0,0,.8); }
+    .cv::before { background:linear-gradient(90deg,rgba(0,0,0,.65),rgba(255,255,255,.22) 1.5%,rgba(0,0,0,.18) 3%,transparent 6%,transparent 96%,rgba(255,255,255,.17) 99%,rgba(0,0,0,.45));
+      box-shadow:inset 0 1px 1px rgba(255,255,255,.3),inset 0 -2px 2px rgba(0,0,0,.4); }
+    .page-edge { position:absolute; width:calc(var(--ws) - 4px); height:calc(var(--H) - 6px);
+      left:calc(var(--ws) / -2 + 2px); top:calc(var(--H) / -2 + 3px);
+      transform:rotateY(180deg) translateZ(calc(var(--d) / 2 - 4px)); backface-visibility:hidden;
+      background:repeating-linear-gradient(90deg,#d5ccaf 0,#e8e0ca 1px,#c6bda4 2px,#e4dcc5 3px); }
+    .book-cap { position:absolute; width:calc(var(--ws) - 4px); height:calc(var(--d) - 7px);
+      left:calc(var(--ws) / -2 + 2px); top:calc(var(--d) / -2 + 2px);
+      transform:rotateX(90deg) translateZ(calc(var(--H) / 2 - 2px)); backface-visibility:hidden;
+      background:repeating-linear-gradient(90deg,#d5ccaf 0,#e8e0ca 1px,#c6bda4 2px,#e4dcc5 3px); }
+    .cap-mask.title,.details-title { font-family:'Newsreader','Noto Serif SC',Georgia,serif; }
+    .poster { filter:drop-shadow(8px 24px 22px rgba(0,0,0,.5)); }
+  </style>
+</head>
+<body id="filmography">
+  <header class="topbar">
+    <a class="back box lbl" href="#filmography" id="backBtn">THE SHELF</a>
+    <div class="brand" aria-label="Kitab Ghar — کتاب گھر">
+      <div class="brand-zh">کتاب گھر</div><div class="brand-en">KITAB GHAR · PAKISTAN</div>
+    </div>
+    <span class="career lbl">STORIES WITHOUT BORDERS</span>
+  </header>
+
+  <nav class="decades" aria-label="Book categories" id="decades">
+    <span class="tab-highlight" id="tabHighlight" aria-hidden="true"></span>
+    <button class="decade-btn lbl" type="button" data-decade="all">All stories</button>
+    <button class="decade-btn lbl" type="button" data-decade="Pakistan">Pakistan</button>
+    <button class="decade-btn lbl" type="button" data-decade="China">China</button>
+    <button class="decade-btn lbl" type="button" data-decade="India">India</button>
+    <button class="decade-btn lbl" type="button" data-decade="World">World</button>
+  </nav>
+
+  <section class="shelf" id="shelf" aria-label="Book shelf">
+    <div class="stage" id="stage"></div>
+  </section>
+  <button type="button" class="play" id="play" aria-label="Open book" title="Open book">
+    <span class="play-triangle" aria-hidden="true"></span>
+  </button>
+  <div class="caption" id="caption" aria-live="polite" aria-atomic="true">
+    <div class="cap-mask title" id="capTitle"></div>
+    <div class="cap-mask sub" id="capSub"></div>
+    <div class="cap-mask year" id="capYear"></div>
+  </div>
+  <button type="button" class="arrow left" id="prev" aria-label="Previous book">
+    <svg viewBox="0 0 18 10" aria-hidden="true"><path d="M5 1 L1 5 L5 9 M1 5 H17"/></svg>
+  </button>
+  <button type="button" class="arrow right" id="next" aria-label="Next book">
+    <svg viewBox="0 0 18 10" aria-hidden="true"><path d="M13 1 L17 5 L13 9 M17 5 H1"/></svg>
+  </button>
+  <footer class="footer lbl">
+    <span>© KITAB GHAR. A SHELF OF STORIES.</span>
+    <div class="links"><a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">FB</a><span>/</span><a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="X">TW</a></div>
+  </footer>
+  <div class="grain" id="grain" aria-hidden="true"></div>
+  <div class="cursor" id="cursor" data-mode="default" aria-hidden="true">
+    <div class="cursor-ring"></div><div class="cursor-dot"></div>
+    <div class="cursor-word">EXPLORE</div>
+  </div>
+
+  <div class="detail" id="detail" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true" tabindex="-1">
+    <div class="detail-top">
+      <div class="brand" aria-label="Kitab Ghar — کتاب گھر">
+        <div class="brand-zh">کتاب گھر</div><div class="brand-en">KITAB GHAR · PAKISTAN</div>
+      </div>
+    </div>
+    <button type="button" class="close box lbl" id="close">BACK TO SHELF</button>
+    <div class="detail-grid">
+      <div class="details-left">
+        <div class="reveal"><span class="details-sub lbl" id="detailSub"></span></div>
+        <div class="reveal"><span class="details-title" id="detailTitle"></span></div>
+        <div class="reveal"><span class="details-meta lbl" id="detailMeta"></span></div>
+        <div class="reveal"><span class="details-synopsis" id="detailSynopsis"></span></div>
+        <div class="reveal"><span class="details-credit" id="detailCredit">Edition cover artwork</span></div>
+        <div class="reveal"><div class="reveal-content"><button class="details-watch" type="button" id="watchBtn">FIND THIS BOOK</button></div></div>
+        <p class="watch-status" id="watchStatus" role="status"></p>
+      </div>
+      <div class="poster-col">
+        <svg class="poster" id="poster" viewBox="0 0 474 750" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="posterClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="474" height="900" /></clipPath>
+            <filter id="inkBleed" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+              <feTurbulence baseFrequency=".011" numOctaves="3" seed="7" type="fractalNoise" result="noise" />
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="120" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <mask id="inkMask" maskUnits="userSpaceOnUse" x="-200" y="-200" width="874" height="1300">
+              <g id="inkCircles" filter="url(#inkBleed)" fill="white">
+                <circle cx="150" cy="330" r="0" data-delay="0"/>
+                <circle cx="340" cy="600" r="0" data-delay="120"/>
+                <circle cx="250" cy="120" r="0" data-delay="220"/>
+                <circle cx="90" cy="760" r="0" data-delay="300"/>
+                <circle cx="400" cy="250" r="0" data-delay="360"/>
+                <circle cx="260" cy="860" r="0" data-delay="420"/>
+                <circle cx="230" cy="470" r="0" data-delay="180"/>
+              </g>
+            </mask>
+          </defs>
+          <g clip-path="url(#posterClip)"><image id="posterImage" mask="url(#inkMask)" preserveAspectRatio="none" x="0" y="0" width="474" height="900" /></g>
+        </svg>
+      </div>
+    </div>
+  </div>
+<script>
+(() => {
+  'use strict';
+  const BOOKS = [
+  {
+    "id": "0",
+    "title": "Pakistan: A Personal History",
+    "author": "Imran Khan",
+    "genre": "Pakistan",
+    "isbn": "9780857500649",
+    "synopsis": "A personal account of Pakistan through family, cricket, faith, and public life.",
+    "url": "https://openlibrary.org/isbn/9780857500649",
+    "color": "#8c8277",
+    "cover": "assets/covers/0.jpg",
+    "aspect": 0.62
+  },
+  {
+    "id": "1",
+    "title": "The Struggle for Pakistan",
+    "author": "Ayesha Jalal",
+    "genre": "Pakistan",
+    "isbn": "9780674052895",
+    "synopsis": "A historical examination of Pakistan’s creation, institutions, and political development.",
+    "url": "https://openlibrary.org/isbn/9780674052895",
+    "color": "#3b1911",
+    "cover": "assets/covers/1.jpg",
+    "aspect": 0.624
+  },
+  {
+    "id": "2",
+    "title": "Moth Smoke",
+    "author": "Mohsin Hamid",
+    "genre": "Pakistan",
+    "isbn": "9781594486609",
+    "synopsis": "A Lahore-set novel exploring desire, privilege, and class through a banker’s unraveling life.",
+    "url": "https://openlibrary.org/isbn/9781594486609",
+    "color": "#676867",
+    "cover": "assets/covers/2.jpg",
+    "aspect": 0.646
+  },
+  {
+    "id": "3",
+    "title": "三体",
+    "author": "刘慈欣",
+    "genre": "China",
+    "isbn": "9787536692930",
+    "synopsis": "A first-contact science fiction novel spanning China’s Cultural Revolution and humanity’s future.",
+    "url": "https://openlibrary.org/isbn/9787536692930",
+    "color": "#695320",
+    "cover": "assets/covers/3.jpg",
+    "translation": "The Three-Body Problem",
+    "aspect": 0.7
+  },
+  {
+    "id": "4",
+    "title": "活着",
+    "author": "余华",
+    "genre": "China",
+    "isbn": "9787506365437",
+    "synopsis": "A family’s struggle to endure profound social and political change in twentieth-century China.",
+    "url": "https://openlibrary.org/isbn/9787506365437",
+    "color": "#07070a",
+    "cover": "assets/covers/4.jpg",
+    "translation": "To Live",
+    "aspect": 0.6767
+  },
+  {
+    "id": "5",
+    "title": "红高粱家族",
+    "author": "莫言",
+    "genre": "China",
+    "isbn": "9787506366670",
+    "synopsis": "A multigenerational story of family, survival, and resistance in rural Shandong.",
+    "url": "https://openlibrary.org/isbn/9787506366670",
+    "color": "#9f9995",
+    "cover": "assets/covers/5.jpg",
+    "translation": "Red Sorghum",
+    "aspect": 0.586
+  },
+  {
+    "id": "6",
+    "title": "The God of Small Things",
+    "author": "Arundhati Roy",
+    "genre": "India",
+    "isbn": "9780812979657",
+    "synopsis": "A family saga set in Kerala, shaped by childhood, memory, caste, and forbidden love.",
+    "url": "https://openlibrary.org/isbn/9780812979657",
+    "color": "#451913",
+    "cover": "assets/covers/6.jpg",
+    "aspect": 0.636
+  },
+  {
+    "id": "7",
+    "title": "Midnight’s Children",
+    "author": "Salman Rushdie",
+    "genre": "India",
+    "isbn": "9780812976533",
+    "synopsis": "A magical realist story entwining one extraordinary life with the history of independent India.",
+    "url": "https://openlibrary.org/isbn/9780812976533",
+    "color": "#9d9ca0",
+    "cover": "assets/covers/7.jpg",
+    "aspect": 0.634
+  },
+  {
+    "id": "8",
+    "title": "The Guide",
+    "author": "R. K. Narayan",
+    "genre": "India",
+    "isbn": "9780143039648",
+    "synopsis": "A railway guide’s unexpected journey through love, deception, and spiritual reinvention.",
+    "url": "https://openlibrary.org/isbn/9780143039648",
+    "color": "#361508",
+    "cover": "assets/covers/8.jpg",
+    "aspect": 0.622
+  },
+  {
+    "id": "9",
+    "title": "O Alquimista",
+    "author": "Paulo Coelho",
+    "genre": "World",
+    "isbn": "9780061122415",
+    "synopsis": "A young shepherd travels in search of treasure and discovers questions of purpose and destiny.",
+    "url": "https://openlibrary.org/isbn/9780061122415",
+    "color": "#948e77",
+    "cover": "assets/covers/9.jpg",
+    "translation": "The Alchemist",
+    "aspect": 0.662
+  },
+  {
+    "id": "10",
+    "title": "Τὰ εἰς ἑαυτόν",
+    "author": "Μάρκος Αὐρήλιος",
+    "genre": "World",
+    "isbn": "9780140449334",
+    "synopsis": "Stoic reflections on responsibility, character, change, and the practice of everyday life.",
+    "url": "https://openlibrary.org/isbn/9780140449334",
+    "color": "#191f22",
+    "cover": "assets/covers/10.jpg",
+    "translation": "Meditations",
+    "aspect": 0.648
+  },
+  {
+    "id": "11",
+    "title": "L’Étranger",
+    "author": "Albert Camus",
+    "genre": "World",
+    "isbn": "9780679720201",
+    "synopsis": "A spare novel confronting alienation, social judgment, and the absurd.",
+    "url": "https://openlibrary.org/isbn/9780679720201",
+    "color": "#0f172c",
+    "cover": "assets/covers/11.jpg",
+    "translation": "The Stranger",
+    "aspect": 0.63
+  },
+  {
+    "id": "12",
+    "title": "راجہ گدھ",
+    "author": "بانو قدسیہ",
+    "genre": "Pakistan",
+    "isbn": "9789693505146",
+    "synopsis": "A philosophical Urdu novel exploring desire, morality, and the consequences of human choices.",
+    "translation": "Raja Gidh",
+    "url": "https://openlibrary.org/isbn/9789693505146",
+    "cover": "assets/covers/12.jpg",
+    "aspect": 0.6535,
+    "color": "#8c8858"
+  },
+  {
+    "id": "13",
+    "title": "Exit West",
+    "author": "Mohsin Hamid",
+    "genre": "Pakistan",
+    "isbn": "9780735212206",
+    "synopsis": "Two lovers leave a city in crisis through mysterious doors, encountering migration, belonging, and change.",
+    "translation": "",
+    "url": "https://openlibrary.org/isbn/9780735212206",
+    "cover": "assets/covers/13.jpg",
+    "aspect": 0.64,
+    "color": "#2c315c"
+  },
+  {
+    "id": "14",
+    "title": "A Case of Exploding Mangoes",
+    "author": "Mohammed Hanif",
+    "genre": "Pakistan",
+    "isbn": "9780307388186",
+    "synopsis": "A darkly comic political novel imagining conspiracies surrounding General Zia’s fatal plane crash.",
+    "translation": "",
+    "url": "https://openlibrary.org/isbn/9780307388186",
+    "cover": "assets/covers/14.jpg",
+    "aspect": 0.772,
+    "color": "#ababab"
+  },
+  {
+    "id": "15",
+    "title": "许三观卖血记",
+    "author": "余华",
+    "genre": "China",
+    "isbn": "9787506365680",
+    "synopsis": "A working man sells his blood to support his family through successive personal and social upheavals.",
+    "translation": "Chronicle of a Blood Merchant",
+    "url": "https://openlibrary.org/isbn/9787506365680",
+    "cover": "assets/covers/15.jpg",
+    "aspect": 0.596,
+    "color": "#9b9894"
+  },
+  {
+    "id": "16",
+    "title": "红楼梦",
+    "author": "曹雪芹",
+    "genre": "China",
+    "isbn": "9787020002207",
+    "synopsis": "A classic of Chinese literature tracing the fortunes, relationships, and decline of an aristocratic household.",
+    "translation": "Dream of the Red Chamber",
+    "url": "https://openlibrary.org/isbn/9787020002207",
+    "cover": "assets/covers/16.jpg",
+    "aspect": 0.6821,
+    "color": "#a16e65"
+  },
+  {
+    "id": "17",
+    "title": "围城",
+    "author": "钱锺书",
+    "genre": "China",
+    "isbn": "9787020024759",
+    "synopsis": "A satirical novel of relationships, intellectual life, and the traps people build around themselves.",
+    "translation": "Fortress Besieged",
+    "url": "https://openlibrary.org/isbn/9787020024759",
+    "cover": "assets/covers/17.jpg",
+    "aspect": 0.674,
+    "color": "#acaca9"
+  },
+  {
+    "id": "18",
+    "title": "The White Tiger",
+    "author": "Aravind Adiga",
+    "genre": "India",
+    "isbn": "9781416562603",
+    "synopsis": "An ambitious driver tells the story of his escape from poverty in a sharply unequal India.",
+    "translation": "",
+    "url": "https://openlibrary.org/isbn/9781416562603",
+    "cover": "assets/covers/18.jpg",
+    "aspect": 0.6393,
+    "color": "#7d5266"
+  },
+  {
+    "id": "19",
+    "title": "The Namesake",
+    "author": "Jhumpa Lahiri",
+    "genre": "India",
+    "isbn": "9780618485222",
+    "synopsis": "A Bengali American family navigates naming, identity, migration, and the distance between generations.",
+    "translation": "",
+    "url": "https://openlibrary.org/isbn/9780618485222",
+    "cover": "assets/covers/19.jpg",
+    "aspect": 0.666,
+    "color": "#9b957f"
+  },
+  {
+    "id": "20",
+    "title": "Train to Pakistan",
+    "author": "Khushwant Singh",
+    "genre": "India",
+    "isbn": "9780143065883",
+    "synopsis": "The lives of a border village are transformed by the violence and upheaval of Partition.",
+    "translation": "",
+    "url": "https://openlibrary.org/isbn/9780143065883",
+    "cover": "assets/covers/20.jpg",
+    "aspect": 0.65,
+    "color": "#645a50"
+  },
+  {
+    "id": "21",
+    "title": "Nineteen Eighty-Four",
+    "author": "George Orwell",
+    "genre": "World",
+    "isbn": "9780451524935",
+    "synopsis": "A dystopian novel about surveillance, language, memory, and the machinery of totalitarian power.",
+    "translation": "",
+    "url": "https://openlibrary.org/isbn/9780451524935",
+    "cover": "assets/covers/21.jpg",
+    "aspect": 0.622,
+    "color": "#969695"
+  },
+  {
+    "id": "22",
+    "title": "The Little Prince",
+    "author": "Antoine de Saint-Exupéry",
+    "genre": "World",
+    "isbn": "9780156012195",
+    "synopsis": "A traveler from a tiny planet reflects on friendship, responsibility, and what adults forget to see.",
+    "translation": "",
+    "url": "https://openlibrary.org/isbn/9780156012195",
+    "cover": "assets/covers/22.jpg",
+    "aspect": 0.8063,
+    "color": "#162e65"
+  },
+  {
+    "id": "23",
+    "title": "Crime and Punishment",
+    "author": "Fyodor Dostoevsky",
+    "genre": "World",
+    "isbn": "9780140449136",
+    "synopsis": "A young man’s crime sets off an intense confrontation with guilt, conscience, and redemption.",
+    "translation": "",
+    "url": "https://openlibrary.org/isbn/9780140449136",
+    "cover": "assets/covers/23.jpg",
+    "aspect": 0.67,
+    "color": "#37352a"
+  }
+];
+  const $ = (s) => document.querySelector(s);
+  const stage = $('#stage'), shelf = $('#shelf'), play = $('#play');
+  const detail = $('#detail'), cursor = $('#cursor'), nav = $('#decades');
+  const tabs = Array.from(nav.querySelectorAll('.decade-btn'));
+  const circles = Array.from(document.querySelectorAll('#inkCircles circle'));
+  const capMasks = [$('#capTitle'),$('#capSub'),$('#capYear')];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const fine = window.matchMedia('(pointer: fine)');
+  const wrap = (v,n) => ((v % n) + n) % n;
+  const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+  const smoothstep = x => { const t=clamp(x,0,1); return t*t*(3-2*t); };
+  const easeOut = x => 1-Math.pow(1-clamp(x,0,1),3);
+  const isReduced = () => reduced.matches;
+  const coverFor = book => book.cover;
+  const preloadCovers = BOOKS.map(book => {
+    const image = new Image(); image.src = book.cover; image.decode().catch(() => {}); return image;
+  });
+  const bookCount = BOOKS.length;
+  const virtualCount = bookCount * 3;
+  const halfCount = bookCount / 2;
+  const tapes=[];
+  for(let v=0;v<virtualCount;v++) {
+    const film=BOOKS[v%bookCount];
+    const el=document.createElement('div'); el.className='tape';
+    el.dataset.virtual=String(v); el.dataset.film=film.id;
+    el.setAttribute('aria-hidden','true');
+    const sp=document.createElement('div'); sp.className='face sp';
+    const cv=document.createElement('div'); cv.className='face cv';
+    sp.style.backgroundColor = film.color;
+    sp.dataset.country = film.genre;
+    const spineTitle = document.createElement('span');
+    spineTitle.className = 'spine-title'; spineTitle.textContent = film.title;
+    const spineAuthor = document.createElement('span');
+    spineAuthor.className = 'spine-author'; spineAuthor.textContent = film.author;
+    sp.append(spineTitle, spineAuthor);
+    cv.style.backgroundImage = `url("${coverFor(film)}")`;
+    sp.style.backgroundSize = cv.style.backgroundSize = '100% 100%';
+    cv.style.backgroundColor = film.color;
+    const spineArt = document.createElement('img');
+    spineArt.src = film.cover; spineArt.alt = ''; spineArt.decoding = 'async';
+    spineArt.className = 'spine-art'; sp.appendChild(spineArt);
+    el.append(sp,cv); stage.appendChild(el);
+    const pages = document.createElement('div'); pages.className = 'page-edge';
+    const cap = document.createElement('div'); cap.className = 'book-cap';
+    el.append(pages, cap);
+    const item={v,film,el,sp,cv,r:0,lift:0};
+    el.addEventListener('pointerenter',()=>{hover=v;});
+    el.addEventListener('pointerleave',()=>{if(hover===v)hover=-1;});
+    el.addEventListener('click',e=>{
+      if(isOpen || performance.now()<suppressClickUntil) return;
+      e.stopPropagation();
+      if(Math.abs(item.r)<.5 && Math.abs(T-s)<.36) openDetail();
+      else T=Math.round(T+item.r);
+    });
+    tapes.push(item);
+  }
+
+  // A real height probe resolves min(vh,vw) identically to the CSS media queries.
+  const heightProbe=document.createElement('div');
+  heightProbe.style.cssText='position:fixed;height:var(--H);width:0;visibility:hidden;pointer-events:none;';
+  document.body.appendChild(heightProbe);
+  let H=0,ws=0,d=0,gap=0,W=0,cyShelf=0;
+  function measure() {
+    H=heightProbe.getBoundingClientRect().height; ws=H*.135; d=H*474/750; gap=H*.03;
+    W=window.innerWidth; cyShelf=window.innerHeight/2;
+    stage.style.setProperty('--ws',`${ws}px`); stage.style.setProperty('--d',`${d}px`);
+    updateTab(false);
+  }
+  // First view: Noon in Ashes, middle copy; keep scroll coordinates unbounded across wraps.
+  let s=bookCount, T=bookCount, active=0, hover=-1, mx=window.innerWidth/2, my=window.innerHeight/2;
+  let cx=mx,cy=my,tiltX=0,tiltY=0,onCover=false,isOpen=false;
+  let lastFrame=performance.now(), lastWheel=-1, drag=null, suppressClickUntil=0;
+  let inkStart=-1, posterAnimating=false, detailAnimation=null, detailEpoch=0, lastFocus=null;
+  const B = r => Math.abs(r)>=1 ? .5*Math.sign(r) : (r+Math.sin(Math.PI*r)/Math.PI)/2;
+  const relative = v => wrap(v-s+virtualCount/2,virtualCount)-virtualCount/2;
+  const subtitle = book => book.translation ? `${book.author} · ${book.translation}` : book.author;
+  const captionValues = f => [f.title, subtitle(f), f.genre];
+
+  function captionSwap(index,dir=1,initial=false) {
+    const vals=captionValues(BOOKS[index]);
+    capMasks.forEach((mask,i)=>{
+      if(isReduced() || initial) {
+        mask.replaceChildren(); const span=document.createElement('span');
+        span.textContent=vals[i]; mask.appendChild(span); return;
+      }
+      [...mask.children].forEach(old=>{
+        const from=getComputedStyle(old).transform;
+        old.getAnimations().forEach(a=>a.cancel());
+        const a=old.animate([{transform:from==='none'?'translateY(0)':from},
+          {transform:`translateY(${-dir*105}%)`}],
+          {duration:650,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
+        a.onfinish=()=>old.remove();
+      });
+      const span=document.createElement('span');span.textContent=vals[i];mask.appendChild(span);
+      span.animate([{transform:`translateY(${dir*105}%)`},{transform:'translateY(0%)'}],
+        {duration:650,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
+    });
+  }
+  function updateTab(animate=true) {
+    const decade=BOOKS[active].genre;
+    const tab=tabs.find(t=>t.dataset.decade===decade);
+    tabs.forEach(t=>t.setAttribute('aria-current', String(t===tab)));
+    const indicator=$('#tabHighlight');
+    if(!tab) return;
+    if(!animate) indicator.style.transition='none';
+    indicator.style.width=`${tab.offsetWidth}px`;
+    indicator.style.transform=`translateX(${tab.offsetLeft}px)`;
+    if(!animate) requestAnimationFrame(()=>indicator.style.removeProperty('transition'));
+  }
+  function navigate(step) { if(!isOpen) T=Math.round(T)+step; }
+  $('#prev').addEventListener('click',()=>navigate(-1));
+  $('#next').addEventListener('click',()=>navigate(1));
+  tabs.forEach(btn=>btn.addEventListener('click',()=>{
+    if(isOpen) return;
+    const decade=btn.dataset.decade;
+    const i=(decade==='all')?0:BOOKS.findIndex(f=>f.genre===decade);
+    if(i<0) return;
+    const current=wrap(Math.round(T),bookCount);
+    let delta=wrap(i-current+halfCount,bookCount)-halfCount;
+    if(delta===-halfCount && i>current) delta=halfCount;
+    T=Math.round(T)+delta;
+  }));
+  $('#backBtn').addEventListener('click',e=>{
+    e.preventDefault();
+    if(isOpen) closeDetail(); else {
+      const current=wrap(Math.round(T),bookCount);
+      const delta=wrap(0-current+halfCount,bookCount)-halfCount;
+      T=Math.round(T)+delta;
+    }
+  });
+  play.addEventListener('click',openDetail);
+
+  const visualCenter = () => {
+    const activeItem=tapes.reduce((best,item)=>Math.abs(item.r)<Math.abs(best.r)?item:best,tapes[0]);
+    return activeItem.cv.getBoundingClientRect();
+  };
+  function coverInsets() {
+    const rect=visualCenter();
+    const ww=window.innerWidth, hh=window.innerHeight;
+    return {
+      top:clamp(rect.top,0,hh), left:clamp(rect.left,0,ww),
+      right:clamp(ww-rect.right,0,ww), bottom:clamp(hh-rect.bottom,0,hh),
+      cx:rect.left+rect.width/2,cy:rect.top+rect.height/2
+    };
+  }
+  function clipFor(rect) {
+    return `inset(${rect.top}px ${rect.right}px ${rect.bottom}px ${rect.left}px round 3px)`;
+  }
+  function posterFor(book) {
+    const image = $('#posterImage');
+    image.setAttribute('href', coverFor(book));
+    image.setAttribute('x', '0'); image.setAttribute('y', '0');
+    image.setAttribute('width', '474'); image.setAttribute('height', String(474 / book.aspect));
+  }
+  function fillDetail(film) {
+    $('#detailSub').textContent=subtitle(film);
+    $('#detailTitle').textContent=film.title;
+    $('#detailTitle').lang=film.genre==='China'?'zh-Hans':film.id==='12'?'ur':'en';
+    $('#detailTitle').dir=film.id==='12'?'rtl':'ltr';
+    $('#poster').style.aspectRatio=String(film.aspect);
+    $('#poster').setAttribute('viewBox', `0 0 474 ${474 / film.aspect}`);
+    $('#detailMeta').textContent=film.genre.toUpperCase();
+    $('#detailSynopsis').textContent=film.synopsis;
+    $('#detailCredit').textContent='Cover artwork from Open Library · ISBN ' + film.isbn;
+    $('#watchBtn').dataset.url=film.url;
+    $('#watchStatus').classList.remove('shown');
+    posterFor(film);
+    circles.forEach(c=>c.setAttribute('r','0'));
+    detail.querySelectorAll('.reveal > *').forEach(e=>{
+      e.getAnimations().forEach(a=>a.cancel());
+      e.style.transform='translateY(110%)';
+    });
+  }
+  function openDetail() {
+    if(isOpen || Math.abs(T-s)>.37 || drag?.moved) return;
+    T=Math.round(T);
+    const index=wrap(Math.round(T),bookCount),film=BOOKS[index];
+    lastFocus=document.activeElement;
+    fillDetail(film); const rect=coverInsets();
+    const startClip=clipFor(rect);
+    const myEpoch=++detailEpoch;
+    isOpen=true; inkStart=performance.now()+(isReduced()?-5000:520);
+    posterAnimating=true;
+    detail.style.visibility='visible'; detail.style.pointerEvents='auto';
+    detail.setAttribute('aria-hidden','false');
+    detail.style.transformOrigin=`${rect.cx}px ${rect.cy}px`;
+    if(detailAnimation) detailAnimation.cancel();
+    const duration=isReduced()?1:950;
+    detailAnimation=detail.animate([
+      {clipPath:startClip,transform:'rotate(-4.5deg)'},
+      {clipPath:'inset(0px 0px 0px 0px round 0px)',transform:'rotate(0deg)'}
+    ],{duration,easing:'cubic-bezier(.76,0,.18,1)',fill:'both'});
+    detailAnimation.finished.then(()=>{
+      if(myEpoch===detailEpoch && isOpen) {
+        detail.style.clipPath='inset(0px)'; detail.style.transform='rotate(0deg)';
+        detailAnimation.cancel(); detailAnimation=null;
+      }
+    }).catch(()=>{});
+    const nodes=[...detail.querySelectorAll('.reveal > *')];
+    nodes.forEach((node,i)=>{
+      node.animate([{transform:'translateY(110%)'},{transform:'translateY(0%)'}],{
+        duration:isReduced()?1:900, delay:isReduced()?0:620+i*75,
+        easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'
+      });
+    });
+    $('#close').focus({preventScroll:true});
+  }
+  function closeDetail() {
+    if(!isOpen) return;
+    const myEpoch=++detailEpoch;
+    const rect=coverInsets();
+    if(detailAnimation) detailAnimation.cancel();
+    detail.style.clipPath='inset(0px)'; detail.style.transform='rotate(0deg)';
+    detail.style.transformOrigin=`${rect.cx}px ${rect.cy}px`;
+    detailAnimation=detail.animate([
+      {clipPath:'inset(0px 0px 0px 0px round 0px)',transform:'rotate(0deg)'},
+      {clipPath:clipFor(rect),transform:'rotate(-4.5deg)'}
+    ],{duration:isReduced()?1:750,easing:'cubic-bezier(.76,0,.18,1)',fill:'both'});
+    detailAnimation.finished.then(()=>{
+      if(myEpoch!==detailEpoch) return;
+      isOpen=false; posterAnimating=false;
+      detailAnimation.cancel(); detailAnimation=null;
+      detail.style.visibility='hidden'; detail.style.pointerEvents='none';
+      detail.style.removeProperty('clip-path'); detail.style.removeProperty('transform');
+      detail.setAttribute('aria-hidden','true');
+      detail.querySelectorAll('.reveal > *').forEach(e=>{
+        e.getAnimations().forEach(a=>a.cancel());e.style.transform='translateY(110%)';
+      });
+      if(lastFocus && typeof lastFocus.focus==='function') lastFocus.focus({preventScroll:true});
+    }).catch(()=>{});
+  }
+  $('#close').addEventListener('click',closeDetail);
+  $('#watchBtn').addEventListener('click',()=>{
+    window.open($('#watchBtn').dataset.url, '_blank', 'noopener,noreferrer');
+  });
+
+  window.addEventListener('keydown',e=>{
+    if(e.key==='Escape' && isOpen) {e.preventDefault();closeDetail();return;}
+    if(isOpen) {
+      if(e.key==='Tab') {
+        const buttons=[...detail.querySelectorAll('button')].filter(b=>b.getClientRects().length);
+        const current=buttons.indexOf(document.activeElement);
+        if(e.shiftKey && current<=0) {e.preventDefault();buttons[buttons.length-1].focus();}
+        else if(!e.shiftKey && current===buttons.length-1) {e.preventDefault();buttons[0].focus();}
+      }
+      return;
+    }
+    if(e.key==='ArrowLeft') {e.preventDefault();navigate(-1);}
+    else if(e.key==='ArrowRight') {e.preventDefault();navigate(1);}
+    else if(e.key==='Enter' && (document.activeElement===document.body || document.activeElement===shelf)) {
+      e.preventDefault();openDetail();
+    }
+  });
+  // Wheel (both axes) and drag scrub the same physical target coordinate.
+  window.addEventListener('wheel',e=>{
+    if(isOpen) return;
+    e.preventDefault();
+    const delta=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
+    T+=clamp(delta,-120,120)/(ws+gap)*.34;
+    lastWheel=performance.now();
+  },{passive:false});
+  shelf.addEventListener('pointerdown',e=>{
+    if(isOpen || (e.button!==0 && e.pointerType==='mouse')) return;
+    drag={id:e.pointerId,x:e.clientX,T0:T,moved:false};
+  });
+  window.addEventListener('pointermove',e=>{
+    if(!drag || drag.id!==e.pointerId) return;
+    const dx=e.clientX-drag.x;
+    if(Math.abs(dx)>5) drag.moved=true;
+    if(drag.moved) T=drag.T0-dx/(ws+gap);
+  });
+  function endDrag(e) {
+    if(!drag || drag.id!==e.pointerId) return;
+    if(drag.moved) {T=Math.round(T);suppressClickUntil=performance.now()+350;}
+    drag=null;
+  }
+  window.addEventListener('pointerup',endDrag);
+  window.addEventListener('pointercancel',endDrag);
+  document.addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;},{passive:true});
+  document.addEventListener('pointerleave',()=>{mx=-10000;my=-10000;});
+  window.addEventListener('resize',measure,{passive:true});
+
+  function render(now) {
+    const dt=Math.min(50,now-lastFrame)/1000;lastFrame=now;
+    if(lastWheel>=0 && now-lastWheel>200) {T=Math.round(T);lastWheel=-1;}
+    const k=isReduced()?1000:(drag?.moved?22:6.5);
+    s+=(T-s)*(1-Math.exp(-k*dt));
+    if(Math.abs(T-s)<.0001) s=T;
+    if(Math.abs(s)>bookCount*4) { const loops=Math.trunc(s/bookCount);s-=loops*bookCount;T-=loops*bookCount; }
+    const newActive=wrap(Math.round(s),bookCount);
+    if(newActive!==active && !isOpen) {
+      const direction=Math.sign(T-s)||1;
+      active=newActive;captionSwap(active,direction);
+      updateTab();
+    }
+    const nearing=Math.abs(T-s)<.3 && !isOpen;
+    onCover=nearing && Math.abs(mx-W/2)<d*.55 && Math.abs(my-cyShelf)<H*.55;
+    const wantedY=onCover?(mx-W/2)/(d*.55)*9:(mx-W/2)/W*5;
+    const wantedX=onCover?-(my-cyShelf)/(H/2)*6:0;
+    const tiltEase=isReduced()?1:1-Math.exp(-7*dt);
+    tiltX+=(wantedX-tiltX)*tiltEase;tiltY+=(wantedY-tiltY)*tiltEase;
+    const centreExtra=(d-ws+1.6*gap);
+    let activeItem=null,best=Infinity;
+    for(const item of tapes) {
+      const r=relative(item.v);item.r=r;
+      const x=r*(ws+gap)+centreExtra*B(r);
+      if(Math.abs(x)>W/2+1.5*d) {item.el.style.visibility='hidden';continue;}
+      item.el.style.visibility='visible';
+      const o=smoothstep(Math.max(0,1-Math.abs(r)));
+      const liftTarget=(hover===item.v && Math.abs(r)>.5 && !isOpen)?1:0;
+      const liftEase=isReduced()?1:(1-Math.exp(-12*dt));
+      item.lift+=(liftTarget-item.lift)*liftEase;
+      const y=-o*.025*H-item.lift*.065*H;
+      item.el.style.transform=`translate3d(${x}px,${y}px,${o*.2*H}px) rotateZ(${-3.5*o-item.lift*1.5}deg) rotateX(${tiltX*o}deg) rotateY(${(-90+tiltY)*o}deg)`;
+      item.el.style.zIndex=String(Math.round(100-Math.abs(r)*4));
+      item.sp.style.setProperty('--shade',(o*.55).toFixed(4));
+      item.cv.style.setProperty('--shade',((1-o)*.5).toFixed(4));
+      if(Math.abs(r)<best) {best=Math.abs(r);activeItem=item;}
+    }
+    const playScale=isOpen?0:smoothstep(Math.max(0,1-Math.abs(T-s)*3));
+    play.style.left=`${W/2-.5*d-6}px`;
+    play.style.top=`${cyShelf+.36*H}px`;
+    play.style.transform=`translate(-50%,-50%) scale(${playScale})`;
+    play.style.pointerEvents=playScale>.5?'auto':'none';
+    // The cursor is a spring-smoothed overlay, never subject to shelf transforms.
+    const cEase=isReduced()?1:1-Math.exp(-16*dt);
+    cx+=(mx-cx)*cEase;cy+=(my-cy)*cEase;
+    cursor.style.transform=`translate3d(${cx}px,${cy}px,0)`;
+    if(fine.matches) {
+      let mode='default';
+      if(!isOpen && onCover) mode='open';
+      else {
+        const target=document.elementFromPoint(mx,my);
+        if(target?.closest('button,a')) mode='btn';
+        else if(!isOpen && target?.closest('.tape')) mode='spine';
+      }
+      if(cursor.dataset.mode!==mode) cursor.dataset.mode=mode;
+    }
+    if(posterAnimating) {
+      if(isReduced()) {circles.forEach(c=>c.setAttribute('r','720'));posterAnimating=false;}
+      else {
+        const elapsed=now-inkStart;
+        for(const c of circles) {
+          const delay=Number(c.dataset.delay);
+          c.setAttribute('r',String(720*easeOut((elapsed-delay)/1250)));
+        }
+        if(elapsed>1700) posterAnimating=false;
+      }
+    }
+    requestAnimationFrame(render);
+  }
+  measure();captionSwap(active,1,true);updateTab(false);
+  requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>
